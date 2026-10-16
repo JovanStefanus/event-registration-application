@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Masuk · Karcis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+<main class="auth">
+  <section class="auth-hero" aria-label="Tentang Karcis">
+    <a class="brand" href="/login">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true"><rect x="1.5" y="5.5" width="25" height="17" rx="3.5" stroke="currentColor" stroke-width="2.4"/><path d="M10 6v16" stroke="currentColor" stroke-width="2.4" stroke-dasharray="2.6 2.6"/></svg>
+      Karcis
+    </a>
+    <div style="display:grid; gap:1.2rem">
+      <h1>Satu karcis untuk setiap kegiatan.</h1>
+      <p>Lihat kegiatan yang dibuka, pantau sisa kursi, dan daftar dalam satu tempat.</p>
+      <div class="sample" aria-hidden="true">
+        <div class="stub"><b>25</b><span>Okt</span></div>
+        <div class="tbody"><strong>Contoh: Seminar Cloud Computing</strong><small>Aula Utama</small><small>Sisa 18 dari 40 kursi</small></div>
+      </div>
+    </div>
+    <div class="hero-roles">
+      <p><b>Peserta</b> mendaftar ke kegiatan dan mengelola pendaftarannya.</p>
+      <p><b>Pembuat acara</b> membuat kegiatan dan melihat siapa yang mendaftar.</p>
+      <p><b>Admin</b> menyetujui pembuat acara dan menjaga akun tetap rapi.</p>
+    </div>
+  </section>
+
+  <section class="auth-panel">
+    <div class="auth-card">
+      <a class="brand" href="/login">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true"><rect x="1.5" y="5.5" width="25" height="17" rx="3.5" stroke="currentColor" stroke-width="2.4"/><path d="M10 6v16" stroke="currentColor" stroke-width="2.4" stroke-dasharray="2.6 2.6"/></svg>
+        Karcis
+      </a>
+      <div>
+        <h1>Masuk</h1>
+        <p class="sub">Gunakan email dan password akun Anda.</p>
+      </div>
+      <div id="notice" class="notice" hidden role="status"></div>
+      <form id="loginForm" class="form" novalidate>
+        <div class="field">
+          <label for="email">Email</label>
+          <input class="input" id="email" type="email" autocomplete="username" placeholder="nama@email.com">
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input class="input" id="password" type="password" autocomplete="current-password">
+        </div>
+        <div class="error" id="err" role="alert"></div>
+        <button class="btn block" id="submit" type="submit">Masuk</button>
+      </form>
+      <p class="auth-alt">Belum punya akun? <a href="/register">Buat akun</a></p>
+      <div id="health" class="health"><i></i>Memeriksa layanan</div>
+    </div>
+  </section>
+</main>
+
+<script src="/assets/common.js"></script>
+<script>
+  if (getToken()) location.replace("/app");
+  startHealth("health");
+
+  const params = new URLSearchParams(location.search);
+  const notices = {
+    user: ["ok", "Akun dibuat. Silakan masuk."],
+    organizer: ["warn", "Akun dibuat. Admin perlu menyetujui akun pembuat acara sebelum Anda bisa masuk."],
+    expired: ["bad", "Sesi berakhir. Silakan masuk lagi."],
+  };
+  const key = params.get("registered") || (params.get("expired") ? "expired" : "");
+  if (notices[key]) {
+    const n = $("notice");
+    n.className = "notice " + notices[key][0];
+    n.textContent = notices[key][1];
+    n.hidden = false;
+  }
+
+  $("loginForm").onsubmit = async ev => {
+    ev.preventDefault();
+    $("err").textContent = "";
+    await busy($("submit"), async () => {
+      try {
+        const data = await api("/api/auth/login", {
+          method: "POST",
+          body: JSON.stringify({ email: $("email").value.trim(), password: $("password").value }),
+        });
+        saveSession(data.access_token, data.user);
+        location.href = "/app";
+      } catch (e) {
+        $("err").textContent = e.message;
+      }
+    });
+  };
+</script>
+</body>
+</html>

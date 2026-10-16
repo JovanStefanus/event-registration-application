@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Buat akun · Karcis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+<main class="auth">
+  <section class="auth-hero" aria-label="Tentang Karcis">
+    <a class="brand" href="/login">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true"><rect x="1.5" y="5.5" width="25" height="17" rx="3.5" stroke="currentColor" stroke-width="2.4"/><path d="M10 6v16" stroke="currentColor" stroke-width="2.4" stroke-dasharray="2.6 2.6"/></svg>
+      Karcis
+    </a>
+    <div style="display:grid; gap:1.2rem">
+      <h1>Mulai dengan satu akun.</h1>
+      <p>Pilih peran yang sesuai. Peserta langsung bisa masuk, pembuat acara aktif setelah disetujui admin.</p>
+    </div>
+    <div class="hero-roles">
+      <p><b>Peserta</b> mendaftar ke kegiatan yang tersedia.</p>
+      <p><b>Pembuat acara</b> membuat kegiatan sendiri dan melihat pendaftarnya.</p>
+    </div>
+  </section>
+
+  <section class="auth-panel">
+    <div class="auth-card">
+      <a class="brand" href="/login">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true"><rect x="1.5" y="5.5" width="25" height="17" rx="3.5" stroke="currentColor" stroke-width="2.4"/><path d="M10 6v16" stroke="currentColor" stroke-width="2.4" stroke-dasharray="2.6 2.6"/></svg>
+        Karcis
+      </a>
+      <div>
+        <h1>Buat akun</h1>
+        <p class="sub">Isi data diri, lalu pilih peran Anda.</p>
+      </div>
+      <form id="registerForm" class="form" novalidate>
+        <div class="field">
+          <label for="name">Nama lengkap</label>
+          <input class="input" id="name" autocomplete="name">
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input class="input" id="email" type="email" autocomplete="username" placeholder="nama@email.com">
+        </div>
+        <div class="field">
+          <label for="phone">Nomor telepon</label>
+          <input class="input" id="phone" inputmode="tel" autocomplete="tel" placeholder="081234567890">
+          <span class="hint">9 sampai 15 digit, boleh diawali +.</span>
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input class="input" id="password" type="password" autocomplete="new-password">
+          <span class="hint">Minimal 8 karakter.</span>
+        </div>
+        <fieldset class="roles">
+          <legend>Peran</legend>
+          <label class="role-opt">
+            <input type="radio" name="role" value="user" checked>
+            <span><b>Peserta</b><small>Mendaftar ke kegiatan. Bisa masuk setelah akun dibuat.</small></span>
+          </label>
+          <label class="role-opt">
+            <input type="radio" name="role" value="organizer">
+            <span><b>Pembuat acara</b><small>Membuat kegiatan. Perlu disetujui admin sebelum bisa masuk.</small></span>
+          </label>
+        </fieldset>
+        <div class="error" id="err" role="alert"></div>
+        <button class="btn block" id="submit" type="submit">Buat akun</button>
+      </form>
+      <p class="auth-alt">Sudah punya akun? <a href="/login">Masuk</a></p>
+    </div>
+  </section>
+</main>
+
+<script src="/assets/common.js"></script>
+<script>
+  if (getToken()) location.replace("/app");
+
+  $("registerForm").onsubmit = async ev => {
+    ev.preventDefault();
+    $("err").textContent = "";
+    const role = document.querySelector('input[name="role"]:checked').value;
+    await busy($("submit"), async () => {
+      try {
+        await api("/api/auth/register", {
+          method: "POST",
+          body: JSON.stringify({
+            name: $("name").value.trim(),
+            email: $("email").value.trim(),
+            phone: $("phone").value.trim(),
+            password: $("password").value,
+            role,
+          }),
+        });
+        location.href = "/login?registered=" + role;
+      } catch (e) {
+        $("err").textContent = e.message;
+      }
+    });
+  };
+</script>
+</body>
+</html>

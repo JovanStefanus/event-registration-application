@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 620" width="1280" height="620" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#334155"/>
+    </marker>
+    <marker id="arrd" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#64748b"/>
+    </marker>
+  </defs>
+
+  <rect width="1280" height="620" fill="#ffffff"/>
+  <text x="20" y="32" font-size="22" font-weight="700" fill="#0f172a">Arsitektur Aplikasi Pendaftaran Kegiatan (Karcis)</text>
+
+  <!-- Docker host -->
+  <rect x="230" y="50" width="1030" height="550" rx="14" fill="#f8fafc" stroke="#94a3b8" stroke-width="2" stroke-dasharray="8 6"/>
+  <text x="248" y="76" font-size="14" font-weight="700" fill="#475569">Docker Compose (satu host)</text>
+
+  <!-- Networks -->
+  <rect x="260" y="110" width="590" height="360" rx="12" fill="#0ea5e9" fill-opacity="0.10" stroke="#0284c7" stroke-width="1.5"/>
+  <text x="276" y="134" font-size="14" font-weight="700" fill="#0369a1">network: frontend_net</text>
+  <rect x="590" y="110" width="630" height="360" rx="12" fill="#f59e0b" fill-opacity="0.10" stroke="#d97706" stroke-width="1.5"/>
+  <text x="1204" y="134" font-size="14" font-weight="700" fill="#b45309" text-anchor="end">network: backend_net</text>
+
+  <!-- Browser -->
+  <rect x="20" y="230" width="170" height="100" rx="10" fill="#e2e8f0" stroke="#64748b" stroke-width="2"/>
+  <text x="105" y="272" font-size="17" font-weight="700" fill="#0f172a" text-anchor="middle">Browser</text>
+  <text x="105" y="294" font-size="13" fill="#334155" text-anchor="middle">Admin / Pembuat acara</text>
+  <text x="105" y="312" font-size="13" fill="#334155" text-anchor="middle">/ Peserta</text>
+
+  <!-- Frontend -->
+  <rect x="290" y="200" width="180" height="160" rx="10" fill="#ffffff" stroke="#0284c7" stroke-width="2.5"/>
+  <text x="380" y="228" font-size="18" font-weight="700" fill="#0f172a" text-anchor="middle">frontend</text>
+  <text x="380" y="248" font-size="13" font-weight="600" fill="#0369a1" text-anchor="middle">Nginx 1.27 (alpine)</text>
+  <text x="380" y="276" font-size="12" fill="#334155" text-anchor="middle">Halaman statis HTML/JS</text>
+  <text x="380" y="294" font-size="12" fill="#334155" text-anchor="middle">/login  /register  /app</text>
+  <text x="380" y="312" font-size="12" fill="#334155" text-anchor="middle">Reverse proxy ke backend</text>
+  <text x="380" y="340" font-size="11" fill="#64748b" text-anchor="middle">container: event_frontend</text>
+
+  <!-- Backend -->
+  <rect x="620" y="200" width="200" height="160" rx="10" fill="#ffffff" stroke="#4f46e5" stroke-width="2.5"/>
+  <text x="720" y="228" font-size="18" font-weight="700" fill="#0f172a" text-anchor="middle">backend</text>
+  <text x="720" y="248" font-size="13" font-weight="600" fill="#4338ca" text-anchor="middle">FastAPI (Python 3.12)</text>
+  <text x="720" y="276" font-size="12" fill="#334155" text-anchor="middle">REST API  •  JWT + bcrypt</text>
+  <text x="720" y="294" font-size="12" fill="#334155" text-anchor="middle">Hak akses per peran, validasi</text>
+  <text x="720" y="312" font-size="12" fill="#334155" text-anchor="middle">Log request  •  /health</text>
+  <text x="720" y="340" font-size="11" fill="#64748b" text-anchor="middle">container: event_backend (non-root)</text>
+
+  <!-- DB -->
+  <rect x="930" y="200" width="200" height="160" rx="10" fill="#ffffff" stroke="#d97706" stroke-width="2.5"/>
+  <text x="1030" y="228" font-size="18" font-weight="700" fill="#0f172a" text-anchor="middle">db</text>
+  <text x="1030" y="248" font-size="13" font-weight="600" fill="#b45309" text-anchor="middle">PostgreSQL 16 (alpine)</text>
+  <text x="1030" y="276" font-size="12" fill="#334155" text-anchor="middle">Tabel: users, events,</text>
+  <text x="1030" y="294" font-size="12" fill="#334155" text-anchor="middle">registrations</text>
+  <text x="1030" y="312" font-size="12" fill="#334155" text-anchor="middle">Port tidak dipublikasikan</text>
+  <text x="1030" y="340" font-size="11" fill="#64748b" text-anchor="middle">container: event_db</text>
+
+  <!-- Volume -->
+  <rect x="945" y="395" width="170" height="56" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+  <text x="1030" y="418" font-size="14" font-weight="700" fill="#78350f" text-anchor="middle">volume: pgdata</text>
+  <text x="1030" y="436" font-size="11" fill="#78350f" text-anchor="middle">/var/lib/postgresql/data</text>
+
+  <!-- Arrows -->
+  <line x1="190" y1="280" x2="288" y2="280" stroke="#334155" stroke-width="2.5" marker-end="url(#arr)"/>
+  <text x="240" y="262" font-size="12" font-weight="600" fill="#334155" text-anchor="middle">HTTP</text>
+  <text x="240" y="300" font-size="11" fill="#334155" text-anchor="middle">:8080→80</text>
+
+  <line x1="470" y1="280" x2="618" y2="280" stroke="#334155" stroke-width="2.5" marker-end="url(#arr)"/>
+  <text x="544" y="254" font-size="12" font-weight="600" fill="#334155" text-anchor="middle">/api/*, /health</text>
+  <text x="544" y="270" font-size="11" fill="#334155" text-anchor="middle">proxy_pass</text>
+  <text x="544" y="302" font-size="11" fill="#334155" text-anchor="middle">http://backend:8000</text>
+
+  <line x1="820" y1="280" x2="928" y2="280" stroke="#334155" stroke-width="2.5" marker-end="url(#arr)"/>
+  <text x="874" y="262" font-size="12" font-weight="600" fill="#334155" text-anchor="middle">SQL :5432</text>
+  <text x="874" y="300" font-size="11" fill="#334155" text-anchor="middle">DB_HOST=db</text>
+
+  <line x1="1030" y1="360" x2="1030" y2="393" stroke="#334155" stroke-width="2.5" marker-end="url(#arr)"/>
+  <text x="1042" y="382" font-size="11" fill="#334155">data persisten</text>
+
+  <!-- Optional Swagger path -->
+  <path d="M105,230 V90 H720 V198" fill="none" stroke="#64748b" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arrd)"/>
+  <text x="480" y="84" font-size="12" font-weight="600" fill="#475569">opsional: host :8000 → Swagger /docs (debug)</text>
+
+  <!-- Legend / notes -->
+  <line x1="260" y1="510" x2="300" y2="510" stroke="#334155" stroke-width="2.5" marker-end="url(#arr)"/>
+  <text x="310" y="514" font-size="12" fill="#334155">Alur permintaan utama</text>
+  <line x1="260" y1="536" x2="300" y2="536" stroke="#64748b" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arrd)"/>
+  <text x="310" y="540" font-size="12" fill="#334155">Akses opsional</text>
+
+  <text x="520" y="514" font-size="12" fill="#334155">• backend satu-satunya service di dua jaringan, sehingga frontend tidak bisa menjangkau db langsung</text>
+  <text x="520" y="534" font-size="12" fill="#334155">• Urutan start: db (healthy: pg_isready) → backend (healthy: GET /health), lalu frontend start</text>
+  <text x="520" y="554" font-size="12" fill="#334155">• Konfigurasi dan rahasia dari file .env (contoh: .env.example), bukan di dalam image</text>
+  <text x="520" y="574" font-size="12" fill="#334155">• Antar-container saling menemukan lewat nama service (DNS internal Docker)</text>
+</svg>

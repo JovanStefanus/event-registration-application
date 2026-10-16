@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Karcis</title>
+<script>
+  var t = null;
+  try { t = localStorage.getItem("token"); } catch (e) {}
+  location.replace(t ? "/app" : "/login");
+</script>
+</head>
+<body>
+<noscript><a href="/login">Masuk ke Karcis</a></noscript>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dasbor · Karcis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="/app">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true"><rect x="1.5" y="5.5" width="25" height="17" rx="3.5" stroke="currentColor" stroke-width="2.4"/><path d="M10 6v16" stroke="currentColor" stroke-width="2.4" stroke-dasharray="2.6 2.6"/></svg>
+      Karcis
+    </a>
+    <nav id="nav" class="nav" aria-label="Menu utama"></nav>
+    <div class="userchip">
+      <span id="uname" class="name"></span>
+      <span id="urole" class="badge"></span>
+      <button id="logout" class="btn ghost sm" type="button">Keluar</button>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <div class="pagehead">
+    <div>
+      <h1 id="pageTitle"></h1>
+      <p id="pageSub"></p>
+    </div>
+    <div id="pageActions"></div>
+  </div>
+  <div id="stats" class="strip" aria-label="Ringkasan"></div>
+  <div id="view"></div>
+</main>
+
+<div id="health" class="health"><i></i>Memeriksa layanan</div>
+
+<!-- Dialog: buat / ubah kegiatan (pembuat acara) -->
+<dialog id="eventDialog" aria-labelledby="evTitle">
+  <form id="eventForm" class="dlg" novalidate>
+    <h2 id="evTitle">Buat kegiatan</h2>
+    <input type="hidden" id="evId">
+    <div class="field">
+      <label for="evName">Nama kegiatan</label>
+      <input class="input" id="evName">
+    </div>
+    <div class="field">
+      <label for="evDesc">Deskripsi</label>
+      <textarea class="input" id="evDesc" rows="3"></textarea>
+    </div>
+    <div class="two">
+      <div class="field">
+        <label for="evDate">Tanggal dan waktu</label>
+        <input class="input" id="evDate" type="datetime-local">
+      </div>
+      <div class="field">
+        <label for="evQuota">Kuota</label>
+        <input class="input" id="evQuota" type="number" min="1">
+      </div>
+    </div>
+    <div class="field">
+      <label for="evLocation">Lokasi</label>
+      <input class="input" id="evLocation">
+    </div>
+    <div class="error" id="evErr" role="alert"></div>
+    <div class="btns">
+      <button class="btn ghost" type="button" data-close>Batal</button>
+      <button class="btn" id="evSubmit" type="submit">Simpan kegiatan</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Dialog: daftar / ubah pendaftaran (peserta) -->
+<dialog id="regDialog" aria-labelledby="rgTitle">
+  <form id="regForm" class="dlg" novalidate>
+    <h2 id="rgTitle">Daftar ke kegiatan</h2>
+    <input type="hidden" id="rgId">
+    <div class="field">
+      <label for="rgEvent">Kegiatan</label>
+      <select class="input" id="rgEvent"></select>
+    </div>
+    <div class="two">
+      <div class="field">
+        <label for="rgName">Nama</label>
+        <input class="input" id="rgName">
+      </div>
+      <div class="field">
+        <label for="rgPhone">Nomor telepon</label>
+        <input class="input" id="rgPhone" inputmode="tel">
+      </div>
+    </div>
+    <div class="field">
+      <label for="rgEmail">Email</label>
+      <input class="input" id="rgEmail" type="email">
+    </div>
+    <div class="error" id="rgErr" role="alert"></div>
+    <div class="btns">
+      <button class="btn ghost" type="button" data-close>Batal</button>
+      <button class="btn" id="rgSubmit" type="submit">Daftar</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Dialog: konfirmasi -->
+<dialog id="confirmDialog" aria-labelledby="cfTitle">
+  <div class="dlg">
+    <h2 id="cfTitle">Konfirmasi</h2>
+    <p id="cfMsg"></p>
+    <div class="btns">
+      <button class="btn ghost" type="button" data-close>Batal</button>
+      <button class="btn danger" id="cfOk" type="button">Lanjutkan</button>
+    </div>
+  </div>
+</dialog>
+
+<script src="/assets/common.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>
