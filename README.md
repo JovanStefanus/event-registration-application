@@ -80,8 +80,8 @@ Skema dibuat otomatis saat backend start dan aman dijalankan ulang. Database dar
 Prasyarat: Docker dan Docker Compose terpasang.
 
 ```bash
-git clone <URL_REPOSITORY>
-cd <nama-folder>
+git clone https://github.com/JovanStefanus/event-registration-application
+cd event-registration-application
 cp .env.example .env        # lalu edit password, JWT_SECRET, dan akun admin
 docker compose up -d --build
 docker compose ps           # semua service harus running / healthy
