@@ -15,8 +15,30 @@
   --red-soft: #fbe3e0;
   --ok: #17673f;
   --ok-soft: #d9f0e2;
+  --shadow: rgba(10, 30, 28, 0.3);
   --f-display: "Bricolage Grotesque", "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
   --f-body: "Public Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+/* Tema gelap: diaktifkan lewat data-theme pada <html> */
+:root[data-theme="dark"] {
+  --paper: #0d1512;
+  --card: #16211d;
+  --ink: #e8f0ec;
+  --muted: #93a9a2;
+  --line: #2a3833;
+  --teal: #4fd1bd;
+  --teal-d: #38b3a0;
+  --teal-soft: #1d3531;
+  --gold: #f2c14e;
+  --gold-soft: #3a2f12;
+  --gold-ink: #f4d58a;
+  --red: #ff8a80;
+  --red-soft: #3a1d1b;
+  --ok: #6ee7a8;
+  --ok-soft: #16301f;
+  --shadow: rgba(0, 0, 0, 0.6);
+  color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
@@ -42,18 +64,24 @@ a { color: var(--teal); font-weight: 600; text-decoration-thickness: 1px; text-u
 
 :focus-visible { outline: 3px solid var(--teal); outline-offset: 2px; }
 
+/* Teks hanya untuk pembaca layar */
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
 /* ---------- Tombol ---------- */
 .btn {
   font: inherit; font-weight: 600; font-size: 0.93rem;
   display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem;
   padding: 0.6rem 1.05rem; border-radius: 8px; border: 1px solid var(--teal);
-  background: var(--teal); color: #fff; cursor: pointer; text-decoration: none;
+  background: var(--teal); color: var(--paper); cursor: pointer; text-decoration: none;
   transition: background 0.15s, border-color 0.15s;
 }
 .btn:hover { background: var(--teal-d); border-color: var(--teal-d); }
 .btn.ghost { background: var(--card); color: var(--ink); border-color: var(--line); }
-.btn.ghost:hover { background: var(--paper); border-color: #b9c4bd; }
-.btn.danger { background: var(--card); color: var(--red); border-color: #e7b9b4; }
+.btn.ghost:hover { background: var(--paper); border-color: var(--muted); }
+.btn.danger { background: var(--card); color: var(--red); border-color: var(--line); }
 .btn.danger:hover { background: var(--red-soft); border-color: var(--red); }
 .btn.sm { padding: 0.4rem 0.75rem; font-size: 0.85rem; }
 .btn.block { width: 100%; padding: 0.75rem 1rem; }
@@ -66,19 +94,23 @@ a { color: var(--teal); font-weight: 600; text-decoration-thickness: 1px; text-u
 .hint { font-size: 0.82rem; color: var(--muted); }
 .input {
   font: inherit; width: 100%; padding: 0.65rem 0.8rem; color: var(--ink);
-  background: var(--card); border: 1px solid #b9c4bd; border-radius: 8px;
+  background: var(--card); border: 1px solid var(--line); border-radius: 8px;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
-.input:hover { border-color: #8fa097; }
+.input:hover { border-color: var(--muted); }
 .input:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px var(--teal-soft); }
+select.input { appearance: auto; }
 textarea.input { resize: vertical; min-height: 4.5rem; }
 .two { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
-@media (max-width: 560px) { .two { grid-template-columns: 1fr; } }
+.three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; }
+@media (max-width: 560px) { .two, .three { grid-template-columns: 1fr; } }
 .error { color: var(--red); font-size: 0.9rem; min-height: 1.3rem; }
 .notice { padding: 0.75rem 0.95rem; border-radius: 8px; font-size: 0.92rem; border: 1px solid transparent; }
-.notice.ok { background: var(--ok-soft); color: var(--ok); border-color: #b5dfc6; }
-.notice.warn { background: var(--gold-soft); color: var(--gold-ink); border-color: #ecd48b; }
-.notice.bad { background: var(--red-soft); color: var(--red); border-color: #efbcb7; }
+.notice.ok { background: var(--ok-soft); color: var(--ok); border-color: var(--ok); }
+.notice.warn { background: var(--gold-soft); color: var(--gold-ink); border-color: var(--gold); }
+.notice.bad { background: var(--red-soft); color: var(--red); border-color: var(--red); }
+.check { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; }
+.check input { width: 1.05rem; height: 1.05rem; accent-color: var(--teal); }
 
 /* ---------- Halaman masuk / daftar ---------- */
 .auth { min-height: 100vh; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); }
@@ -95,9 +127,9 @@ textarea.input { resize: vertical; min-height: 4.5rem; }
   width: min(420px, 100%); transform: rotate(-2.5deg); margin: 0.5rem 0;
   display: grid; grid-template-columns: 82px 1fr; background: #fff; color: var(--ink); border-radius: 10px;
 }
-.sample .stub { background: var(--gold); color: var(--ink); border-radius: 10px 0 0 10px; border-right: 2px dashed rgba(16, 34, 31, 0.45); }
+.sample .stub { background: var(--gold); color: #10221f; border-radius: 10px 0 0 10px; border-right: 2px dashed rgba(16, 34, 31, 0.45); }
 .sample .tbody { padding: 0.9rem 1rem; display: grid; gap: 0.15rem; }
-.sample .tbody small { color: var(--muted); }
+.sample .tbody small { color: #566a66; }
 .auth-panel { display: grid; place-items: center; padding: 2rem 1.5rem; }
 .auth-card { width: 100%; max-width: 410px; display: grid; gap: 1.4rem; }
 .auth-card .sub { color: var(--muted); margin-top: 0.4rem; }
@@ -114,14 +146,14 @@ textarea.input { resize: vertical; min-height: 4.5rem; }
 .roles legend { font-size: 0.88rem; font-weight: 600; padding: 0; margin-bottom: 0.4rem; }
 .role-opt { position: relative; display: block; cursor: pointer; }
 .role-opt input { position: absolute; opacity: 0; inset: 0; }
-.role-opt span { display: grid; gap: 0.1rem; padding: 0.7rem 0.9rem; background: var(--card); border: 1px solid #b9c4bd; border-radius: 8px; }
+.role-opt span { display: grid; gap: 0.1rem; padding: 0.7rem 0.9rem; background: var(--card); border: 1px solid var(--line); border-radius: 8px; }
 .role-opt small { color: var(--muted); font-size: 0.84rem; }
 .role-opt input:checked + span { border-color: var(--teal); box-shadow: inset 0 0 0 1px var(--teal); background: var(--teal-soft); }
 .role-opt input:focus-visible + span { outline: 3px solid var(--teal); outline-offset: 2px; }
 
 /* ---------- Bilah atas ---------- */
 .topbar { position: sticky; top: 0; z-index: 10; background: var(--card); border-bottom: 1px solid var(--line); }
-.topbar-in { max-width: 1080px; margin: 0 auto; padding: 0 1.2rem; display: flex; align-items: center; gap: 1.6rem; min-height: 62px; }
+.topbar-in { max-width: 1080px; margin: 0 auto; padding: 0 1.2rem; display: flex; align-items: center; gap: 1.2rem; min-height: 62px; }
 .topbar .brand { color: var(--teal); }
 .nav { display: flex; gap: 0.3rem; flex: 1; align-self: stretch; }
 .nav button {
@@ -150,37 +182,53 @@ textarea.input { resize: vertical; min-height: 4.5rem; }
 .strip > div { background: var(--card); padding: 0.85rem 1.1rem; }
 .strip b { display: block; font-family: var(--f-display); font-size: 1.7rem; font-weight: 700; line-height: 1.1; }
 .strip span { color: var(--muted); font-size: 0.86rem; }
-.toolbar { margin-bottom: 1rem; }
+
+/* ---------- Toolbar & filter ---------- */
+.toolbar { margin-bottom: 1rem; display: grid; gap: 0.6rem; }
 .toolbar .input { max-width: 420px; }
+.filters { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: flex-end; }
+.filters .field { gap: 0.2rem; }
+.filters .field > label { font-size: 0.78rem; color: var(--muted); }
+.filters .input { width: auto; min-width: 150px; padding: 0.5rem 0.65rem; }
+.pager { display: flex; align-items: center; justify-content: center; gap: 0.8rem; margin-top: 1.2rem; }
+.pager .pg { font-size: 0.9rem; color: var(--muted); font-weight: 600; }
 
 /* ---------- Badge ---------- */
 .badge { display: inline-flex; align-items: center; padding: 0.12rem 0.6rem; border-radius: 99px; font-size: 0.76rem; font-weight: 700; background: var(--paper); color: var(--muted); white-space: nowrap; }
-.badge.admin { background: var(--ink); color: #fff; }
+.badge.admin { background: var(--ink); color: var(--paper); }
 .badge.organizer { background: var(--gold-soft); color: var(--gold-ink); }
 .badge.user { background: var(--teal-soft); color: var(--teal); }
 .badge.pending { background: var(--gold-soft); color: var(--gold-ink); }
 .badge.active { background: var(--ok-soft); color: var(--ok); }
 .badge.full { background: var(--red-soft); color: var(--red); }
+.badge.draft { background: var(--paper); color: var(--muted); }
+.badge.published { background: var(--ok-soft); color: var(--ok); }
+.badge.cancelled { background: var(--red-soft); color: var(--red); }
+.badge.cat { background: var(--teal-soft); color: var(--teal); }
+.chip { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.2rem 0.65rem; border-radius: 99px; background: var(--paper); border: 1px solid var(--line); font-size: 0.8rem; font-weight: 600; color: var(--muted); }
+
+.stars { color: var(--gold); letter-spacing: 0.05em; font-size: 0.95rem; white-space: nowrap; }
+.stars .muted { letter-spacing: normal; }
 
 /* ---------- Karcis kegiatan ---------- */
 .ticket {
   display: grid; grid-template-columns: 92px minmax(0, 1fr) auto; margin-bottom: 0.9rem;
-  background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+  background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden;
 }
 .stub {
   display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 0.1rem;
   padding: 1rem 0.4rem; background: var(--teal-soft); color: var(--teal);
-  border-right: 2px dashed rgba(14, 79, 74, 0.4); border-radius: 11px 0 0 11px;
+  border-right: 2px dashed var(--line);
 }
 .stub b { font-family: var(--f-display); font-size: 2rem; font-weight: 800; line-height: 1; }
 .stub span { font-weight: 700; font-size: 0.95rem; }
 .stub small { font-size: 0.8rem; opacity: 0.85; }
-.ticket.full .stub { background: #e8eae8; color: var(--muted); border-right-color: #c2c9c4; }
+.ticket.full .stub { background: var(--paper); color: var(--muted); }
 .tbody { padding: 1rem 1.2rem; display: grid; gap: 0.35rem; align-content: start; min-width: 0; }
 .tbody .title { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
 .meta { display: flex; align-items: center; gap: 0.45rem; color: var(--muted); font-size: 0.9rem; }
 .meta svg { flex: none; }
-.desc { color: #34484a; font-size: 0.93rem; overflow-wrap: anywhere; }
+.desc { color: var(--ink); opacity: 0.82; font-size: 0.93rem; overflow-wrap: anywhere; }
 .seats { display: flex; align-items: center; gap: 0.7rem; margin-top: 0.25rem; max-width: 380px; }
 .bar { flex: 1; height: 8px; background: var(--paper); border-radius: 99px; overflow: hidden; }
 .bar span { display: block; height: 100%; background: var(--teal); border-radius: 99px; }
@@ -191,16 +239,25 @@ textarea.input { resize: vertical; min-height: 4.5rem; }
 .parts { margin-top: 0.6rem; padding-top: 0.7rem; border-top: 1px dashed var(--line); display: grid; gap: 0.35rem; font-size: 0.92rem; }
 .parts ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.2rem; }
 .parts .muted { margin-left: 0.4rem; }
+.thumb {
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  height: 168px;
+  object-fit: cover;
+  justify-self: start;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+}
 @media (max-width: 720px) {
   .ticket { grid-template-columns: 1fr; }
-  .stub { flex-direction: row; justify-content: flex-start; gap: 0.6rem; padding: 0.6rem 1rem; border-right: 0; border-bottom: 2px dashed rgba(14, 79, 74, 0.4); border-radius: 11px 11px 0 0; }
-  .ticket.full .stub { border-bottom-color: #c2c9c4; }
+  .stub { flex-direction: row; justify-content: flex-start; gap: 0.6rem; padding: 0.6rem 1rem; border-right: 0; border-bottom: 2px dashed var(--line); }
   .stub b { font-size: 1.5rem; }
   .tact { flex-direction: row; flex-wrap: wrap; border-left: 0; border-top: 1px solid var(--line); padding: 0.8rem 1.2rem; }
   .tact .btn { width: auto; }
 }
 
-/* ---------- Baris daftar (pendaftaran, pengguna) ---------- */
+/* ---------- Baris daftar (pendaftaran, pengguna, daftar tunggu) ---------- */
 .rows { background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
 .row { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 0.95rem 1.2rem; border-top: 1px solid var(--line); }
 .row:first-child { border-top: 0; }
@@ -208,28 +265,88 @@ textarea.input { resize: vertical; min-height: 4.5rem; }
 .row .kv { display: flex; flex-wrap: wrap; gap: 0.1rem 1.1rem; font-size: 0.92rem; }
 .actions { display: flex; flex-wrap: wrap; gap: 0.45rem; }
 @media (max-width: 640px) { .row { flex-direction: column; align-items: stretch; } }
-.empty { background: var(--card); border: 1px dashed #b9c4bd; border-radius: 12px; padding: 2.4rem 1.4rem; text-align: center; display: grid; gap: 0.4rem; justify-items: center; }
+.empty { background: var(--card); border: 1px dashed var(--line); border-radius: 12px; padding: 2.4rem 1.4rem; text-align: center; display: grid; gap: 0.4rem; justify-items: center; }
 .empty h3 { font-size: 1.1rem; }
 .empty p { color: var(--muted); max-width: 44ch; }
 
 /* ---------- Dialog ---------- */
-dialog { border: 0; padding: 0; border-radius: 14px; width: min(520px, 92vw); color: var(--ink); background: var(--card); box-shadow: 0 20px 50px rgba(10, 30, 28, 0.3); }
+dialog { border: 0; padding: 0; border-radius: 14px; width: min(520px, 92vw); color: var(--ink); background: var(--card); box-shadow: 0 20px 50px var(--shadow); }
+dialog.wide { width: min(680px, 94vw); }
 dialog::backdrop { background: rgba(10, 30, 28, 0.55); }
 dialog[open] { animation: pop 0.16s ease-out; }
 @keyframes pop { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 .dlg { padding: 1.4rem 1.5rem 1.5rem; display: grid; gap: 1.1rem; }
 .dlg .btns { display: flex; justify-content: flex-end; gap: 0.5rem; }
+.dlg .scroll { max-height: 60vh; overflow: auto; }
+
+/* ---------- Peta ---------- */
+.map { height: 260px; width: 100%; border-radius: 10px; border: 1px solid var(--line); background: var(--teal-soft); z-index: 0; }
+.map-small { height: 200px; }
+.map-fallback { display: grid; place-items: center; height: 100%; padding: 1rem; text-align: center; color: var(--muted); font-size: 0.9rem; }
+.map-marker-dot {
+  display: block; width: 18px; height: 18px; border-radius: 50% 50% 50% 0;
+  background: var(--teal); border: 2px solid var(--card);
+  transform: rotate(-45deg); box-shadow: 0 2px 6px var(--shadow);
+}
+.geolist { display: grid; gap: 0.3rem; max-height: 150px; overflow: auto; }
+.geolist button {
+  font: inherit; text-align: left; padding: 0.5rem 0.7rem; border: 1px solid var(--line);
+  border-radius: 8px; background: var(--card); color: var(--ink); cursor: pointer; font-size: 0.88rem;
+}
+.geolist button:hover { background: var(--teal-soft); border-color: var(--teal); }
+
+/* ---------- Poster ---------- */
+.poster-box { display: grid; gap: 0.5rem; }
+.poster-preview {
+  display: block; width: 100%; max-width: 100%;
+  height: clamp(160px, 34vw, 240px);
+  object-fit: contain;
+  background: var(--paper);
+  border: 1px solid var(--line); border-radius: 10px;
+}
+
+/* ---------- Builder pertanyaan tambahan ---------- */
+.fieldlist { display: grid; gap: 0.6rem; }
+.fieldrow { display: grid; grid-template-columns: 1.4fr 0.9fr auto auto; gap: 0.5rem; align-items: center; padding: 0.6rem; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); }
+.fieldrow .input { padding: 0.5rem 0.6rem; }
+.fieldrow .opt { grid-column: 1 / -1; }
+@media (max-width: 620px) { .fieldrow { grid-template-columns: 1fr 1fr; } }
+
+/* ---------- Tiket & QR ---------- */
+.ticketcard { display: grid; gap: 0.6rem; text-align: center; justify-items: center; }
+.ticketcard .code { font-family: var(--f-display); font-size: 1.6rem; font-weight: 800; letter-spacing: 0.14em; }
+.ticketcard .qr { padding: 0.6rem; background: #fff; border-radius: 10px; }
+.ticketcard .qr img, .ticketcard .qr canvas { display: block; }
+.checkin-result { display: grid; gap: 0.4rem; }
+
+/* ---------- Halaman detail kegiatan ---------- */
+.detail-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 1.4rem; align-items: start; }
+@media (max-width: 860px) { .detail-grid { grid-template-columns: 1fr; } }
+.panel { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 1.2rem 1.3rem; display: grid; gap: 0.8rem; }
+.panel h2 { font-size: 1.15rem; }
+.review { border-top: 1px solid var(--line); padding-top: 0.7rem; display: grid; gap: 0.25rem; }
+.review:first-of-type { border-top: 0; padding-top: 0; }
+.review .who { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+.hero-poster {
+  display: block; width: 100%;
+  height: clamp(200px, 44vw, 340px);
+  object-fit: contain;
+  background: var(--paper);
+  border: 1px solid var(--line); border-radius: 12px;
+}
+.rating-row { display: flex; gap: 0.4rem; align-items: center; }
+.rating-row input { width: 3.4rem; }
 
 /* ---------- Toast & status layanan ---------- */
 .toasts { position: fixed; right: 1rem; bottom: 1rem; display: grid; gap: 0.5rem; z-index: 50; max-width: min(360px, 92vw); }
-.toast { background: var(--ink); color: #fff; padding: 0.7rem 0.95rem; border-radius: 8px; border-left: 5px solid var(--gold); font-size: 0.93rem; animation: slide 0.2s ease-out; }
-.toast.bad { border-left-color: #ff7b72; }
+.toast { background: var(--ink); color: var(--paper); padding: 0.7rem 0.95rem; border-radius: 8px; border-left: 5px solid var(--gold); font-size: 0.93rem; animation: slide 0.2s ease-out; }
+.toast.bad { border-left-color: var(--red); }
 .toast.out { opacity: 0; transition: opacity 0.25s; }
 @keyframes slide { from { opacity: 0; transform: translateX(12px); } to { opacity: 1; transform: none; } }
 .health { position: fixed; left: 1rem; bottom: 1rem; z-index: 20; display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.3rem 0.75rem; background: var(--card); border: 1px solid var(--line); border-radius: 99px; font-size: 0.8rem; font-weight: 600; }
 .health i { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
 .health.up i { background: #1f9d5b; }
-.health.down { color: var(--red); border-color: #e7b9b4; }
+.health.down { color: var(--red); border-color: var(--red); }
 .health.down i { background: var(--red); }
 .auth-panel .health { position: static; justify-self: start; }
 

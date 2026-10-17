@@ -8,8 +8,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY main.py .
 
-# Jalankan sebagai user non-root
-RUN useradd -m appuser
+# Jalankan sebagai user non-root; siapkan folder unggahan poster milik user tersebut
+RUN useradd -m appuser \
+    && mkdir -p /app/uploads \
+    && chown -R appuser:appuser /app/uploads
 USER appuser
 
 EXPOSE 8000

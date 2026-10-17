@@ -4,9 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Dasbor · Karcis</title>
+<script>(function(){try{var t=localStorage.getItem("theme");if(!t){t=window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";}document.documentElement.dataset.theme=t;}catch(e){}})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="/assets/style.css">
 </head>
 <body>
@@ -18,6 +20,7 @@
     </a>
     <nav id="nav" class="nav" aria-label="Menu utama"></nav>
     <div class="userchip">
+      <button id="theme" class="btn ghost sm" type="button" data-theme-toggle="1">Mode gelap</button>
       <span id="uname" class="name"></span>
       <span id="urole" class="badge"></span>
       <button id="logout" class="btn ghost sm" type="button">Keluar</button>
@@ -40,10 +43,12 @@
 <div id="health" class="health"><i></i>Memeriksa layanan</div>
 
 <!-- Dialog: buat / ubah kegiatan (pembuat acara) -->
-<dialog id="eventDialog" aria-labelledby="evTitle">
+<dialog id="eventDialog" class="wide" aria-labelledby="evTitle">
   <form id="eventForm" class="dlg" novalidate>
     <h2 id="evTitle">Buat kegiatan</h2>
     <input type="hidden" id="evId">
+    <input type="hidden" id="evLat">
+    <input type="hidden" id="evLon">
     <div class="field">
       <label for="evName">Nama kegiatan</label>
       <input class="input" id="evName">
@@ -52,7 +57,7 @@
       <label for="evDesc">Deskripsi</label>
       <textarea class="input" id="evDesc" rows="3"></textarea>
     </div>
-    <div class="two">
+    <div class="three">
       <div class="field">
         <label for="evDate">Tanggal dan waktu</label>
         <input class="input" id="evDate" type="datetime-local">
@@ -61,11 +66,49 @@
         <label for="evQuota">Kuota</label>
         <input class="input" id="evQuota" type="number" min="1">
       </div>
+      <div class="field">
+        <label for="evCategory">Kategori</label>
+        <input class="input" id="evCategory" list="categoryList" placeholder="mis. Seminar">
+        <datalist id="categoryList"></datalist>
+      </div>
     </div>
     <div class="field">
-      <label for="evLocation">Lokasi</label>
-      <input class="input" id="evLocation">
+      <label for="evStatus">Status</label>
+      <select class="input" id="evStatus">
+        <option value="published">Dibuka</option>
+        <option value="draft">Draf (belum tampil ke peserta)</option>
+        <option value="cancelled">Dibatalkan</option>
+      </select>
     </div>
+
+    <fieldset class="roles">
+      <legend>Lokasi</legend>
+      <div class="field">
+        <label for="evLocation">Alamat</label>
+        <div class="two">
+          <input class="input" id="evLocation" placeholder="Ketik alamat, lalu tekan Cari">
+          <button class="btn ghost" id="evSearchBtn" type="button">Cari alamat</button>
+        </div>
+        <span class="hint">Ketik alamat lalu tekan Cari, atau geser pin di peta. Alamat akan menyesuaikan saat pin digeser.</span>
+      </div>
+      <div class="geolist" id="evGeoList" hidden></div>
+      <div class="map" id="evMap"></div>
+    </fieldset>
+
+    <div class="field poster-box">
+      <label for="evPoster">Poster / banner (opsional)</label>
+      <input class="input" id="evPoster" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
+      <span class="hint">JPG, PNG, WEBP, atau GIF. Maksimal 5 MB. Poster diunggah setelah kegiatan disimpan.</span>
+      <img id="evPosterPreview" class="poster-preview" alt="Pratinjau poster" hidden>
+      <button class="btn danger sm" id="evPosterRemove" type="button" hidden>Hapus poster</button>
+    </div>
+
+    <fieldset class="roles">
+      <legend>Pertanyaan tambahan untuk pendaftar (opsional)</legend>
+      <div class="fieldlist" id="evFields"></div>
+      <button class="btn ghost sm" id="evAddField" type="button">Tambah pertanyaan</button>
+    </fieldset>
+
     <div class="error" id="evErr" role="alert"></div>
     <div class="btns">
       <button class="btn ghost" type="button" data-close>Batal</button>
@@ -97,10 +140,83 @@
       <label for="rgEmail">Email</label>
       <input class="input" id="rgEmail" type="email">
     </div>
+    <div id="rgFields"></div>
     <div class="error" id="rgErr" role="alert"></div>
     <div class="btns">
       <button class="btn ghost" type="button" data-close>Batal</button>
       <button class="btn" id="rgSubmit" type="submit">Daftar</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Dialog: ikut daftar tunggu -->
+<dialog id="waitDialog" aria-labelledby="wlTitle">
+  <form id="waitForm" class="dlg" novalidate>
+    <h2 id="wlTitle">Ikut daftar tunggu</h2>
+    <p class="muted" id="wlInfo"></p>
+    <input type="hidden" id="wlEvent">
+    <div class="two">
+      <div class="field">
+        <label for="wlName">Nama</label>
+        <input class="input" id="wlName">
+      </div>
+      <div class="field">
+        <label for="wlPhone">Nomor telepon</label>
+        <input class="input" id="wlPhone" inputmode="tel">
+      </div>
+    </div>
+    <div class="field">
+      <label for="wlEmail">Email</label>
+      <input class="input" id="wlEmail" type="email">
+    </div>
+    <div class="error" id="wlErr" role="alert"></div>
+    <div class="btns">
+      <button class="btn ghost" type="button" data-close>Batal</button>
+      <button class="btn" id="wlSubmit" type="submit">Masuk daftar tunggu</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Dialog: tiket QR -->
+<dialog id="ticketDialog" aria-labelledby="tkTitle">
+  <div class="dlg">
+    <h2 id="tkTitle">Tiket Anda</h2>
+    <div class="ticketcard">
+      <div id="tkQr" class="qr"></div>
+      <div class="code" id="tkCode"></div>
+      <div class="muted" id="tkEvent"></div>
+      <div class="muted small" id="tkNote"></div>
+    </div>
+    <div class="btns">
+      <button class="btn ghost" id="tkIcs" type="button">Tambah ke kalender</button>
+      <button class="btn" type="button" data-close>Tutup</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- Dialog: tulis ulasan -->
+<dialog id="reviewDialog" aria-labelledby="rvTitle">
+  <form id="reviewForm" class="dlg" novalidate>
+    <h2 id="rvTitle">Tulis ulasan</h2>
+    <input type="hidden" id="rvEvent">
+    <div class="field">
+      <label for="rvRating">Rating</label>
+      <select class="input" id="rvRating">
+        <option value="5">5 — Sangat baik</option>
+        <option value="4">4 — Baik</option>
+        <option value="3">3 — Cukup</option>
+        <option value="2">2 — Kurang</option>
+        <option value="1">1 — Buruk</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="rvComment">Komentar</label>
+      <textarea class="input" id="rvComment" rows="3" maxlength="1000"></textarea>
+    </div>
+    <div class="error" id="rvErr" role="alert"></div>
+    <div class="btns">
+      <button class="btn ghost" type="button" data-close>Batal</button>
+      <button class="btn" id="rvSubmit" type="submit">Kirim ulasan</button>
     </div>
   </form>
 </dialog>
@@ -117,6 +233,8 @@
   </div>
 </dialog>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="/assets/common.js"></script>
 <script src="/assets/app.js"></script>
 </body>

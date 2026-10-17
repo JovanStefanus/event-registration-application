@@ -34,11 +34,28 @@ services:
       ADMIN_EMAIL: ${ADMIN_EMAIL}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      # Penyimpanan poster (volume Docker) dan batas unggahan
+      UPLOAD_DIR: /app/uploads
+      MAX_UPLOAD_BYTES: ${MAX_UPLOAD_BYTES:-5242880}
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-}
+      # Peta: proxy geocode ke Nominatim/OpenStreetMap
+      GEOCODE_URL: ${GEOCODE_URL:-https://nominatim.openstreetmap.org}
+      GEOCODE_USER_AGENT: ${GEOCODE_USER_AGENT:-KarcisApp/2.0 (demo pendaftaran kegiatan)}
+      # Notifikasi email (kosongkan SMTP_HOST untuk mode dev: hanya dicatat ke log)
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      SMTP_TLS: ${SMTP_TLS:-true}
+      REMINDER_HOURS: ${REMINDER_HOURS:-24}
     depends_on:
       db:
         condition: service_healthy
     ports:
       - "${BACKEND_PORT:-8000}:8000"      # opsional, untuk akses Swagger /docs
+    volumes:
+      - uploads:/app/uploads              # poster kegiatan persisten
     networks:
       - backend_net
       - frontend_net
@@ -60,8 +77,26 @@ services:
     networks:
       - frontend_net
 
+  # Opsional: jalankan dengan `docker compose --profile observability up -d`
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    container_name: event_prometheus
+    profiles: ["observability"]
+    restart: unless-stopped
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - promdata:/prometheus
+    ports:
+      - "9090:9090"
+    depends_on:
+      - backend
+    networks:
+      - backend_net
+
 volumes:
   pgdata:
+  uploads:
+  promdata:
 
 networks:
   frontend_net:

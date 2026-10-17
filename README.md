@@ -12,12 +12,13 @@ flowchart LR
     F -->|/api/* dan /health<br/>reverse proxy, frontend_net| B[backend<br/>FastAPI :8000]
     B -->|SQL :5432<br/>backend_net| D[(db<br/>PostgreSQL)]
     D --- V[(volume: pgdata)]
+    B --- W[(volume: uploads<br/>poster kegiatan)]
 ```
 
 | Service  | Teknologi       | Port host → container | Keterangan |
 |----------|-----------------|-----------------------|------------|
-| frontend | Nginx + HTML/JS | 8080 → 80             | Menyajikan halaman `/login`, `/register`, `/app` dan mem-proxy `/api` ke backend |
-| backend  | Python FastAPI  | 8000 → 8000           | REST API, autentikasi JWT, hak akses per peran, validasi, log, `/health` |
+| frontend | Nginx + HTML/JS | 8080 → 80             | Menyajikan halaman `/login`, `/register`, `/app`, `/event` dan mem-proxy `/api` ke backend |
+| backend  | Python FastAPI  | 8000 → 8000           | REST API, autentikasi JWT, hak akses per peran, unggah poster, proxy geocode, validasi, log, `/health`, `/metrics` |
 | db       | PostgreSQL 16   | tidak dipublikasikan  | Data disimpan di volume `pgdata` |
 
 **Komunikasi antarlayanan:** container saling menemukan lewat nama service (DNS internal Docker). Backend memakai `DB_HOST=db`, Nginx memakai `http://backend:8000`. Database hanya ada di jaringan `backend_net`, sehingga tidak bisa diakses langsung dari frontend maupun dari host.
@@ -29,6 +30,33 @@ flowchart LR
 | `/login` | Masuk (satu pintu untuk semua peran, lalu diarahkan ke dasbor) |
 | `/register` | Buat akun sebagai Peserta atau Pembuat acara |
 | `/app` | Dasbor; isi menu menyesuaikan peran |
+| `/event?id=<id>` | Halaman detail kegiatan: poster, peta, ulasan, dan tombol daftar |
+
+## Fitur
+
+**Lokasi berbasis peta (OpenStreetMap).** Pembuat acara mengetik alamat lalu menekan **Cari alamat**; pin otomatis jatuh di titik tersebut. Menggeser pin akan memperbarui alamat lewat *reverse geocoding* — pengguna tidak perlu mengetik koordinat. Koordinat tetap disimpan di database untuk menampilkan peta, tetapi selalu diisi otomatis. Geocoding diproksikan backend ke Nominatim (gratis, tanpa API key) dan disimpan di cache.
+
+**Poster/banner kegiatan.** Gambar diunggah ke volume Docker `uploads` dan disajikan lewat `GET /api/uploads/{nama}`. Divalidasi tipe (JPG/PNG/WEBP/GIF) dan ukuran (maks. 5 MB, dapat diatur `MAX_UPLOAD_BYTES`).
+
+**Pertanyaan pendaftaran fleksibel.** Pembuat acara dapat menambah pertanyaan sendiri per kegiatan (tipe: teks, angka, pilihan, centang) dengan penanda wajib. Jawaban disimpan ternormalisasi dan tampil pada daftar peserta.
+
+**Status & kategori kegiatan.** Setiap kegiatan punya status `draft` / `published` / `cancelled` dan kategori bebas. Peserta hanya melihat kegiatan `published`; kegiatan yang sudah lewat atau dibatalkan tidak bisa didaftari.
+
+**Pencarian, filter, dan halaman.** Daftar kegiatan dapat dicari (nama/lokasi/kategori) dan disaring berdasarkan kategori, rentang tanggal, serta ketersediaan kursi, dengan paginasi. Daftar pengguna juga dipaginasi dan dapat difilter.
+
+**Tiket QR & check-in.** Setiap pendaftaran mendapat kode tiket unik; peserta melihat QR-nya di dasbor. Panitia menandai kehadiran lewat menu **Check-in** dengan memasukkan kode.
+
+**Daftar tunggu.** Saat kuota penuh, peserta dapat masuk daftar tunggu. Ketika ada pendaftaran dibatalkan, kursi otomatis ditawarkan ke antrean paling awal dan email pemberitahuan dikirim.
+
+**Ulasan & rating.** Peserta yang mengikuti kegiatan yang sudah selesai dapat memberi rating 1–5 dan komentar; rata-rata tampil di kartu dan detail kegiatan.
+
+**Ekspor CSV & kalender.** Panitia dapat mengunduh daftar peserta sebagai CSV; setiap kegiatan bisa diunduh sebagai berkas `.ics` untuk ditambahkan ke kalender.
+
+**Notifikasi email.** Email konfirmasi pendaftaran dan pengingat H-1 dikirim bila `SMTP_HOST` diatur; tanpa konfigurasi email hanya dicatat ke log (mode dev).
+
+**Perpanjangan sesi.** Token login diperbarui otomatis di latar belakang lewat `POST /api/auth/refresh` selama pengguna masih membuka aplikasi.
+
+**Mode gelap & aksesibilitas.** Tema terang/gelap mengikuti preferensi sistem dan dapat diubah manual; fokus keyboard, label ARIA, dan `prefers-reduced-motion` diperhatikan.
 
 ## Tampilan aplikasi
 
@@ -86,10 +114,14 @@ Alur akun:
 ## Model data
 
 - `users`: nama, email (unik), telepon, password (di-hash bcrypt), peran (`admin` / `organizer` / `user`), status (`active` / `pending`)
-- `events`: nama, deskripsi, tanggal, lokasi, kuota, `owner_id` (pembuat acara)
-- `registrations`: kegiatan, akun pemilik, nama, email, telepon. Pasangan `(event_id, email)` unik sehingga pendaftaran ganda ditolak oleh database juga.
+- `events`: nama, deskripsi, tanggal, lokasi (teks alamat), `latitude` + `longitude` (diisi otomatis dari peta), `poster_url`, `category`, `status` (`draft` / `published` / `cancelled`), kuota, `owner_id` (pembuat acara)
+- `registrations`: kegiatan, akun pemilik, nama, email, telepon, `code` (kode tiket unik untuk QR), `checked_in_at`. Pasangan `(event_id, email)` unik sehingga pendaftaran ganda ditolak oleh database juga.
+- `event_fields`: pertanyaan tambahan per kegiatan (label, tipe, wajib, pilihan, urutan)
+- `registration_answers`: jawaban peserta atas pertanyaan tambahan
+- `waitlist`: antrean daftar tunggu ketika kuota penuh (status `waiting` / `notified` / `converted` / `cancelled`)
+- `reviews`: ulasan dan rating 1–5 per peserta per kegiatan
 
-Skema dibuat otomatis saat backend start dan aman dijalankan ulang. Database dari versi sebelumnya (tanpa peran pembuat acara) dimigrasi otomatis tanpa kehilangan data, jadi `docker compose down -v` tidak wajib.
+Skema dibuat otomatis saat backend start dan aman dijalankan ulang. Kolom dan tabel baru (lokasi, poster, status, kategori, pertanyaan tambahan, daftar tunggu, ulasan, kode tiket) ditambahkan lewat `ALTER`/`CREATE ... IF NOT EXISTS`, sehingga database versi sebelumnya dimigrasi otomatis tanpa kehilangan data; `docker compose down -v` tidak wajib.
 
 ## Validasi dan aturan bisnis
 
@@ -104,9 +136,12 @@ Skema dibuat otomatis saat backend start dan aman dijalankan ulang. Database dar
 ## Operasional
 
 - `/health` memeriksa koneksi database; Compose memiliki `healthcheck` untuk `db` dan `backend`.
+- `/metrics` mengekspor metrik gaya Prometheus (jumlah permintaan per rute/status, jumlah kegiatan, uptime). Jalankan Prometheus dengan `docker compose --profile observability up -d` lalu buka http://localhost:9090.
 - Log request dan peristiwa penting: `docker compose logs -f backend`.
-- Data persisten lewat named volume `pgdata`.
+- Data persisten lewat named volume `pgdata`; poster kegiatan disimpan di volume `uploads`.
 - Konfigurasi lewat `.env` (contoh: `.env.example`), tanpa kredensial asli di repository.
+- Login dibatasi kecepatannya di Nginx (`limit_req`) untuk mencegah percobaan brute-force; melebihi batas membalas 429.
+- Email notifikasi/pengingat aktif bila `SMTP_HOST` diisi; tanpa itu hanya dicatat ke log (mode dev).
 - Jika database mati, API membalas 503 dengan pesan jelas dan indikator di UI berubah merah; backend tidak crash.
 
 ## Cara menjalankan
@@ -128,6 +163,10 @@ Buka:
 
 Masuk sebagai admin dengan `ADMIN_EMAIL` dan `ADMIN_PASSWORD` dari `.env`.
 
+Variabel `.env` tambahan yang dapat diatur: `MAX_UPLOAD_BYTES` (batas poster), `PUBLIC_BASE_URL` (tautan pada email), `GEOCODE_URL`/`GEOCODE_USER_AGENT` (peta), `SMTP_*` (email), dan `REMINDER_HOURS` (pengingat H-1).
+
+Monitoring opsional: `docker compose --profile observability up -d` (Prometheus di http://localhost:9090).
+
 Menghentikan: `docker compose down` (data tetap ada). Hapus beserta data: `docker compose down -v`.
 
 ## Skenario pengujian
@@ -148,6 +187,15 @@ Menghentikan: `docker compose down` (data tetap ada). Hapus beserta data: `docke
 | 12 | Persistensi | `docker compose down` lalu `docker compose up -d` | Akun, kegiatan, dan pendaftaran masih ada |
 | 13 | Gangguan layanan | `docker compose stop db` | Indikator UI merah, API 503 dengan pesan jelas |
 | 14 | Pemulihan | `docker compose start db` | Indikator kembali hijau, aplikasi normal |
+| 15 | Cari alamat di peta | Pembuat acara mengetik alamat, tekan Cari, lalu geser pin | Alamat terisi otomatis dari pin (reverse geocode) |
+| 16 | Unggah poster | Pembuat acara memilih gambar saat membuat kegiatan | Poster tampil di kartu dan halaman detail |
+| 17 | Pertanyaan tambahan | Tambah pertanyaan wajib, lalu peserta mendaftar tanpa mengisinya | Ditolak (422); terisi lengkap lalu berhasil |
+| 18 | Kategori & status | Buat kegiatan `draft` lalu lihat sebagai peserta | Kegiatan draf tidak tampil ke peserta |
+| 19 | Filter & paginasi | Cari kata kunci, saring kategori/tanggal, pindah halaman | Daftar menyempit dan halaman berpindah |
+| 20 | Tiket & check-in | Peserta lihat tiket QR; panitia masukkan kode di menu Check-in | Kehadiran tercatat; check-in ulang ditolak (409) |
+| 21 | Daftar tunggu | Kegiatan kuota penuh; peserta ikut daftar tunggu; satu pendaftar membatalkan | Entri antrean berubah menjadi terkonversi |
+| 22 | Ulasan | Peserta memberi rating setelah kegiatan lewat | Rata-rata rating tampil di kartu/detail |
+| 23 | Ekspor & kalender | Unduh CSV peserta dan berkas `.ics` | Berkas terunduh dengan isi yang benar |
 
 Contoh uji lewat terminal:
 
@@ -182,10 +230,10 @@ Simpan screenshot bukti pengujian di folder `docs/` (mis. `docs/uji-06-hak-akses
 | Virtualisasi vs container | Tiap komponen berjalan di container terisolasi |
 | Docker image dan Dockerfile | `backend/Dockerfile`, `frontend/Dockerfile` |
 | Networking container | Jaringan `frontend_net` dan `backend_net`, pemetaan port, reverse proxy Nginx |
-| Storage / volume | Volume `pgdata` untuk persistensi database |
-| Docker Compose / orkestrasi | `docker-compose.yml`, `depends_on` dengan healthcheck |
-| Konfigurasi dan keamanan | `.env`, tanpa kredensial di repo, password di-hash, JWT, akses per peran, user non-root, DB tidak diekspos |
-| Monitoring dan logging | `/health`, healthcheck Compose, log terstruktur |
+| Storage / volume | Volume `pgdata` untuk database dan volume `uploads` untuk poster kegiatan |
+| Docker Compose / orkestrasi | `docker-compose.yml`, `depends_on` dengan healthcheck, profil `observability` |
+| Konfigurasi dan keamanan | `.env`, tanpa kredensial di repo, password di-hash, JWT, akses per peran, user non-root, DB tidak diekspos, rate limit login |
+| Monitoring dan logging | `/health`, `/metrics` gaya Prometheus, Prometheus opsional, healthcheck Compose, log terstruktur |
 
 ## Catatan kontribusi
 
@@ -204,11 +252,13 @@ Proyek ini dikerjakan secara individu.
 │   ├── requirements.txt
 │   └── Dockerfile
 ├── frontend/             # Nginx + halaman statis
-│   ├── index.html, login.html, register.html, app.html
-│   ├── assets/           # style.css, common.js, app.js
+│   ├── index.html, login.html, register.html, app.html, event.html
+│   ├── assets/           # style.css, common.js, app.js, event.js
 │   ├── nginx.conf
 │   └── Dockerfile
 ├── docs/                 # diagram dan bukti pengujian
+├── .github/workflows/    # CI (cek sintaks + build image)
+├── prometheus.yml        # konfigurasi scrape opsional
 ├── docker-compose.yml
 ├── .env.example
 └── README.md

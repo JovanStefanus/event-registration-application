@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Pasang dependensi
+        run: pip install -r backend/requirements.txt
+      - name: Periksa sintaks backend
+        run: python -m py_compile backend/main.py
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Periksa sintaks JavaScript
+        run: |
+          node --check frontend/assets/common.js
+          node --check frontend/assets/app.js
+          node --check frontend/assets/event.js
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Siapkan .env dari contoh
+        run: cp .env.example .env
+      - name: Validasi Docker Compose
+        run: docker compose config
+      - name: Bangun image
+        run: docker compose build

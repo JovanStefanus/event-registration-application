@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Detail kegiatan · Karcis</title>
+<script>(function(){try{var t=localStorage.getItem("theme");if(!t){t=window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";}document.documentElement.dataset.theme=t;}catch(e){}})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="/app">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true"><rect x="1.5" y="5.5" width="25" height="17" rx="3.5" stroke="currentColor" stroke-width="2.4"/><path d="M10 6v16" stroke="currentColor" stroke-width="2.4" stroke-dasharray="2.6 2.6"/></svg>
+      Karcis
+    </a>
+    <nav class="nav" aria-label="Navigasi">
+      <a class="btn ghost sm" href="/app">← Dasbor</a>
+    </nav>
+    <div class="userchip">
+      <button id="theme" class="btn ghost sm" type="button" data-theme-toggle="1">Mode gelap</button>
+      <span id="uname" class="name"></span>
+      <span id="urole" class="badge"></span>
+      <button id="logout" class="btn ghost sm" type="button">Keluar</button>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <div id="detail"><p class="muted">Memuat kegiatan…</p></div>
+</main>
+
+<div id="health" class="health"><i></i>Memeriksa layanan</div>
+
+<!-- Dialog: daftar ke kegiatan -->
+<dialog id="regDialog" aria-labelledby="rgTitle">
+  <form id="regForm" class="dlg" novalidate>
+    <h2 id="rgTitle">Daftar ke kegiatan</h2>
+    <div class="two">
+      <div class="field">
+        <label for="rgName">Nama</label>
+        <input class="input" id="rgName">
+      </div>
+      <div class="field">
+        <label for="rgPhone">Nomor telepon</label>
+        <input class="input" id="rgPhone" inputmode="tel">
+      </div>
+    </div>
+    <div class="field">
+      <label for="rgEmail">Email</label>
+      <input class="input" id="rgEmail" type="email">
+    </div>
+    <div id="rgFields"></div>
+    <div class="error" id="rgErr" role="alert"></div>
+    <div class="btns">
+      <button class="btn ghost" type="button" data-close>Batal</button>
+      <button class="btn" id="rgSubmit" type="submit">Daftar</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Dialog: tulis ulasan -->
+<dialog id="reviewDialog" aria-labelledby="rvTitle">
+  <form id="reviewForm" class="dlg" novalidate>
+    <h2 id="rvTitle">Tulis ulasan</h2>
+    <div class="field">
+      <label for="rvRating">Rating</label>
+      <select class="input" id="rvRating">
+        <option value="5">5 — Sangat baik</option>
+        <option value="4">4 — Baik</option>
+        <option value="3">3 — Cukup</option>
+        <option value="2">2 — Kurang</option>
+        <option value="1">1 — Buruk</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="rvComment">Komentar</label>
+      <textarea class="input" id="rvComment" rows="3" maxlength="1000"></textarea>
+    </div>
+    <div class="error" id="rvErr" role="alert"></div>
+    <div class="btns">
+      <button class="btn ghost" type="button" data-close>Batal</button>
+      <button class="btn" id="rvSubmit" type="submit">Kirim ulasan</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/assets/common.js"></script>
+<script src="/assets/event.js"></script>
+</body>
+</html>
