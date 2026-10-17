@@ -30,6 +30,20 @@ flowchart LR
 | `/register` | Buat akun sebagai Peserta atau Pembuat acara |
 | `/app` | Dasbor; isi menu menyesuaikan peran |
 
+## Tampilan aplikasi
+
+![Halaman buat akun](docs/screenshots/Screenshot272.png)
+![Dasbor login](docs/screenshots/Screenshot273.png)
+![Dasbor user](docs/screenshots/Screenshot274.png)
+![Dasbor user](docs/screenshots/Screenshot275.png)
+![Dasbor user](docs/screenshots/Screenshot276.png)
+![Dasbor admin](docs/screenshots/Screenshot277.png)
+![Dasbor admin](docs/screenshots/Screenshot278.png)
+![Dasbor admin](docs/screenshots/Screenshot279.png)
+![Dasbor pembuat acara](docs/screenshots/Screenshot280.png)
+![Dasbor pembuat acara](docs/screenshots/Screenshot281.png)
+![Dasbor pembuat acara](docs/screenshots/Screenshot282.png)
+
 ## Peran dan hak akses
 
 | Aksi | Admin | Pembuat acara | Peserta |
