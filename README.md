@@ -44,6 +44,26 @@ flowchart LR
 ![Dasbor pembuat acara](docs/screenshots/Screenshot281.png)
 ![Dasbor pembuat acara](docs/screenshots/Screenshot282.png)
 
+### Bukti pengujian
+
+Seluruh screenshot disimpan di folder [`docs/bukti-uji/`](docs/bukti-uji/).
+
+| # | Pengujian | Hasil | Bukti |
+|---|-----------|-------|-------|
+| 0 | Semua service berjalan | Semua container `healthy` | <img src="docs/bukti-uji/uji-00-compose-ps.png" width="360"> |
+| 1 | Buat akun peserta | Akun terbuat, bisa masuk | <img src="docs/bukti-uji/uji-01-buat-peserta.png" width="360"> |
+| 2 | Login dengan password salah | 401, "Email atau password salah" | <img src="docs/bukti-uji/uji-02-login-salah.png" width="360"> |
+| 3 | Pembuat acara belum disetujui | 403, menunggu persetujuan | <img src="docs/bukti-uji/uji-03-organizer-pending.png" width="360"> |
+| 4 | Persetujuan admin | Pembuat acara bisa masuk | <img src="docs/bukti-uji/uji-04-persetujuan-admin.png" width="360"> |
+| 5 | Kelola kegiatan | Daftar kegiatan ikut berubah | <img src="docs/bukti-uji/uji-05-kelola-kegiatan.png" width="360"> |
+| 6 | Batas hak akses | 403 | <img src="docs/bukti-uji/uji-06-hak-akses.png" width="360"> |
+| 7 | Daftar ke kegiatan | Muncul di "Pendaftaran saya", kursi berkurang | <img src="docs/bukti-uji/uji-07-daftar-kegiatan.png" width="360"> |
+| 8 | Ubah dan batalkan pendaftaran | Data berubah, kursi kembali | <img src="docs/bukti-uji/uji-08-ubah-batal.png" width="360"> |
+| 9 | Email tidak valid | 422, data tidak tersimpan | <img src="docs/bukti-uji/uji-09-email-tidak-valid.png" width="360"> |
+| 10 | Kuota penuh | 409 | <img src="docs/bukti-uji/uji-10-kuota-penuh.png" width="360"> |
+| 11 | Pendaftaran ganda | 409 | <img src="docs/bukti-uji/uji-11-pendaftaran-ganda.png" width="360"> |
+| - | Akses tanpa login | 401 | <img src="docs/bukti-uji/uji-401-tanpa-login.png" width="360"> |
+
 ## Peran dan hak akses
 
 | Aksi | Admin | Pembuat acara | Peserta |
