@@ -58,6 +58,39 @@ flowchart LR
 
 **Mode gelap & aksesibilitas.** Tema terang/gelap mengikuti preferensi sistem dan dapat diubah manual; fokus keyboard, label ARIA, dan `prefers-reduced-motion` diperhatikan.
 
+## Tangkapan layar fitur terbaru
+
+Semua gambar di bawah dibuat otomatis dari aplikasi yang sedang berjalan (folder `docs/fitur/`).
+
+### Masuk dan buat akun
+![Halaman masuk](docs/fitur/fitur-01-login.png)
+![Halaman buat akun](docs/fitur/fitur-02-register.png)
+
+### Peta lokasi di form kegiatan (cari alamat, pin bisa digeser)
+![Dialog kegiatan dengan peta OpenStreetMap](docs/fitur/fitur-04-dialog-peta.png)
+
+### Dasbor peserta (poster, kategori, filter, sisa kursi)
+![Dasbor peserta](docs/fitur/fitur-03-dashboard-peserta.png)
+
+### Halaman detail kegiatan (poster + peta + deskripsi)
+![Halaman detail kegiatan](docs/fitur/fitur-05-detail-acara.png)
+
+### Tiket QR, daftar tunggu, dan check-in
+![Tiket QR peserta](docs/fitur/fitur-06-tiket-qr.png)
+![Daftar tunggu pembuat acara](docs/fitur/fitur-07-daftar-tunggu.png)
+![Check-in peserta](docs/fitur/fitur-08-checkin.png)
+
+### Mode gelap
+![Dasbor mode gelap](docs/fitur/fitur-13-mode-gelap.png)
+
+### Bukti penanganan error
+| Kasus | Hasil yang diharapkan | Bukti |
+|-------|-----------------------|-------|
+| Login dengan password salah | 401, "Email atau password salah" | <img src="docs/fitur/fitur-09-error-login.png" width="360"> |
+| Email tidak valid saat daftar | 422, pesan validasi | <img src="docs/fitur/fitur-10-error-email.png" width="360"> |
+| Kode tiket salah saat check-in | 404, "Kode tiket tidak ditemukan" | <img src="docs/fitur/fitur-11-error-checkin.png" width="360"> |
+| Pendaftaran ganda (email sama) | 409, ditolak | <img src="docs/fitur/fitur-12-error-pendaftaran-ganda.png" width="360"> |
+
 ## Tampilan aplikasi
 
 ![Halaman buat akun](docs/screenshots/Screenshot272.png)
