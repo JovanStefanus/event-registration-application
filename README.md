@@ -80,8 +80,8 @@ Semua gambar di bawah dibuat otomatis dari aplikasi yang sedang berjalan (folder
 ![Daftar tunggu pembuat acara](docs/fitur/fitur-07-daftar-tunggu.png)
 ![Check-in peserta](docs/fitur/fitur-08-checkin.png)
 
-### Mode terang
-![Dasbor mode terang](docs/fitur/fitur-13-mode-gelap.png)
+### Mode gelap
+![Dasbor mode gelap](docs/fitur/fitur-13-mode-gelap.png)
 
 ### Bukti penanganan error
 | Kasus | Hasil yang diharapkan | Bukti |
