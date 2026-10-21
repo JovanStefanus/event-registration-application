@@ -193,7 +193,7 @@ Proyek ini dikerjakan secara individu.
 
 | Nama | NIM | Kontribusi |
 |------|-----|-----------|
-| (isi) | (isi) | Seluruh bagian: backend, frontend, Docker/Compose, database, dokumentasi, pengujian |
+| Jovan Stefanus | 2802411626 | Seluruh bagian: backend, frontend, Docker/Compose, database, dokumentasi, pengujian |
 
 ## Struktur repository
 
