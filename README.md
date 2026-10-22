@@ -268,14 +268,6 @@ Simpan screenshot bukti pengujian di folder `docs/` (mis. `docs/uji-06-hak-akses
 | Konfigurasi dan keamanan | `.env`, tanpa kredensial di repo, password di-hash, JWT, akses per peran, user non-root, DB tidak diekspos, rate limit login |
 | Monitoring dan logging | `/health`, `/metrics` gaya Prometheus, Prometheus opsional, healthcheck Compose, log terstruktur |
 
-## Catatan kontribusi
-
-Proyek ini dikerjakan secara individu.
-
-| Nama | NIM | Kontribusi |
-|------|-----|-----------|
-| (isi) | (isi) | Seluruh bagian: backend, frontend, Docker/Compose, database, dokumentasi, pengujian |
-
 ## Struktur repository
 
 ```
